@@ -48,38 +48,21 @@
 
   /* ── Lock screen ── */
   #lock-screen {
-    position: fixed;
-    inset: 0;
-    background: var(--bg);
-    z-index: 999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 32px 24px;
+    position: fixed; inset: 0; background: var(--bg); z-index: 999;
+    display: flex; align-items: center; justify-content: center; padding: 32px 24px;
   }
   #lock-screen.hidden { display: none; }
 
   .lock-box { width: 100%; max-width: 340px; position: relative; z-index: 1; text-align: center; }
   .lock-icon { font-size: 40px; margin-bottom: 18px; }
-  .lock-title { font-family: var(--mono); font-size: 19px; font-weight: 500; margin-bottom: 6px; }
+  .lock-title { font-family: var(--mono); font-size: 18px; font-weight: 500; margin-bottom: 6px; line-height: 1.3; }
   .lock-subtitle { font-size: 13px; color: var(--muted); margin-bottom: 32px; line-height: 1.5; }
 
   .lock-input {
-    width: 100%;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 20px;
-    padding: 16px;
-    outline: none;
-    text-align: center;
-    letter-spacing: 3px;
-    appearance: none;
-    transition: border-color 0.2s;
-    margin-bottom: 10px;
-    display: block;
+    width: 100%; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; color: var(--text); font-family: var(--mono); font-size: 20px;
+    padding: 16px; outline: none; text-align: center; letter-spacing: 3px;
+    appearance: none; transition: border-color 0.2s; margin-bottom: 10px; display: block;
   }
   .lock-input:focus { border-color: var(--accent); }
   .lock-input.error { border-color: var(--warn); animation: shake 0.3s ease; }
@@ -94,277 +77,181 @@
   .lock-error { font-size: 13px; color: var(--warn); font-family: var(--mono); min-height: 20px; margin-bottom: 14px; }
 
   .lock-btn {
-    width: 100%;
-    background: var(--accent);
-    color: #0a0e14;
-    border: none;
-    border-radius: 12px;
-    font-family: var(--sans);
-    font-size: 16px;
-    font-weight: 600;
-    padding: 16px;
-    cursor: pointer;
-    touch-action: manipulation;
+    width: 100%; background: var(--accent); color: #0a0e14; border: none;
+    border-radius: 12px; font-family: var(--sans); font-size: 16px; font-weight: 600;
+    padding: 16px; cursor: pointer; touch-action: manipulation;
     transition: background 0.15s, transform 0.1s;
   }
   .lock-btn:active { transform: scale(0.98); background: #00c49d; }
 
   /* ── App ── */
-  #app { padding: 24px 16px 100px; display: none; }
+  #app { padding: 20px 14px 100px; display: none; }
   .container { max-width: 680px; margin: 0 auto; position: relative; z-index: 1; }
 
   /* ── Header ── */
   header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
-    padding-bottom: 18px;
-    border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); gap: 12px;
   }
-
-  .header-left h1 { font-family: var(--mono); font-size: 18px; font-weight: 500; }
-  .header-left .subtitle { font-size: 11px; color: var(--muted); margin-top: 3px; letter-spacing: 0.6px; text-transform: uppercase; }
+  .header-left h1 { font-family: var(--mono); font-size: 16px; font-weight: 500; line-height: 1.3; }
+  .header-left .subtitle { font-size: 10px; color: var(--muted); margin-top: 3px; letter-spacing: 0.6px; text-transform: uppercase; }
 
   .badge {
-    background: var(--accent-dim);
-    border: 1px solid rgba(0,212,170,0.3);
-    color: var(--accent);
-    font-family: var(--mono);
-    font-size: 10px;
-    padding: 4px 9px;
-    border-radius: 4px;
-    letter-spacing: 0.5px;
+    background: var(--accent-dim); border: 1px solid rgba(0,212,170,0.3); color: var(--accent);
+    font-family: var(--mono); font-size: 10px; padding: 4px 9px; border-radius: 4px;
+    letter-spacing: 0.5px; flex-shrink: 0; margin-top: 2px;
   }
 
   /* ── Stats ── */
-  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 10px; text-align: center; }
-  .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); margin-bottom: 5px; }
-  .stat-value { font-family: var(--mono); font-size: 26px; font-weight: 500; line-height: 1; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 8px; text-align: center; }
+  .stat-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); margin-bottom: 5px; }
+  .stat-value { font-family: var(--mono); font-size: 24px; font-weight: 500; line-height: 1; }
   .stat-value.accent { color: var(--accent); }
   .stat-value.warn { color: var(--warn); }
 
   /* ── Loading bar ── */
-  .loading-bar { height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; margin-bottom: 20px; }
+  .loading-bar { height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; margin-bottom: 16px; }
   .loading-bar-inner { height: 100%; background: var(--accent); border-radius: 1px; animation: loadanim 1.2s ease-in-out infinite; }
-  @keyframes loadanim { 0% { width:0%;margin-left:0 } 50% { width:60%;margin-left:20% } 100% { width:0%;margin-left:100% } }
+  @keyframes loadanim { 0%{width:0%;margin-left:0} 50%{width:60%;margin-left:20%} 100%{width:0%;margin-left:100%} }
   .loading-bar.hidden { display: none; }
 
   /* ── Add Tray ── */
-  .add-tray-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 20px; }
-  .panel-label { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 12px; }
-  .add-tray-row { display: flex; gap: 10px; }
+  .add-tray-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+  .panel-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px; }
+  .add-tray-row { display: flex; gap: 8px; }
 
   .add-tray-row input {
-    flex: 1;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 16px;
-    padding: 12px 14px;
-    outline: none;
-    appearance: none;
-    transition: border-color 0.2s;
+    flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); font-family: var(--mono); font-size: 16px; padding: 11px 12px;
+    outline: none; appearance: none; transition: border-color 0.2s; min-width: 0;
   }
   .add-tray-row input:focus { border-color: var(--accent); }
-  .add-tray-row input::placeholder { color: var(--muted); }
+  .add-tray-row input::placeholder { color: var(--muted); font-size: 13px; }
 
   .btn-tray-add {
-    background: var(--accent);
-    color: #0a0e14;
-    border: none;
-    border-radius: 8px;
-    font-family: var(--sans);
-    font-size: 15px;
-    font-weight: 600;
-    padding: 12px 18px;
-    cursor: pointer;
-    white-space: nowrap;
-    touch-action: manipulation;
+    background: var(--accent); color: #0a0e14; border: none; border-radius: 8px;
+    font-family: var(--sans); font-size: 14px; font-weight: 600; padding: 11px 16px;
+    cursor: pointer; white-space: nowrap; touch-action: manipulation; flex-shrink: 0;
     transition: background 0.15s, transform 0.1s;
-    flex-shrink: 0;
   }
   .btn-tray-add:active { transform: scale(0.97); }
   .btn-tray-add:disabled { opacity: 0.5; cursor: not-allowed; }
 
   /* ── Tray cards ── */
-  .trays { display: flex; flex-direction: column; gap: 14px; }
-
+  .trays { display: flex; flex-direction: column; gap: 12px; }
   .tray-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
 
+  /* Tray header — two rows on mobile */
   .tray-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 16px;
-    cursor: pointer;
-    user-select: none;
-    gap: 10px;
-    border-bottom: 1px solid transparent;
-    transition: border-color 0.2s;
+    padding: 13px 14px; cursor: pointer; user-select: none;
+    border-bottom: 1px solid transparent; transition: border-color 0.2s;
   }
   .tray-card.open .tray-header { border-bottom-color: var(--border); }
 
-  .tray-header-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
-  .tray-chevron { color: var(--muted); font-size: 12px; transition: transform 0.25s; flex-shrink: 0; }
+  .tray-header-row1 { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .tray-chevron { color: var(--muted); font-size: 11px; transition: transform 0.25s; flex-shrink: 0; }
   .tray-card.open .tray-chevron { transform: rotate(90deg); }
 
-  .tray-name-wrap { min-width: 0; flex: 1; }
-
-  /* Inline edit for tray name */
-  .tray-name-display { font-size: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* Tray name — full width, no truncation */
+  .tray-name-display { font-size: 16px; font-weight: 600; flex: 1; word-break: break-word; }
   .tray-name-input {
-    font-size: 15px;
-    font-weight: 600;
-    font-family: var(--sans);
-    background: var(--bg);
-    border: 1px solid var(--accent);
-    border-radius: 6px;
-    color: var(--text);
-    padding: 4px 8px;
-    outline: none;
-    width: 100%;
-    display: none;
+    font-size: 15px; font-weight: 600; font-family: var(--sans);
+    background: var(--bg); border: 1px solid var(--accent); border-radius: 6px;
+    color: var(--text); padding: 5px 9px; outline: none; flex: 1; min-width: 0; display: none;
   }
+  .tray-name-wrap { display: flex; flex: 1; min-width: 0; align-items: center; }
   .tray-name-wrap.editing .tray-name-display { display: none; }
-  .tray-name-wrap.editing .tray-name-input { display: block; }
+  .tray-name-wrap.editing .tray-name-input { display: block; width: 100%; }
 
-  .tray-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .tray-header-row2 { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-left: 21px; }
+  .tray-meta { font-size: 11px; color: var(--muted); }
 
-  .tray-header-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .tray-header-btns { display: flex; gap: 6px; align-items: center; }
 
-  .pill { font-family: var(--mono); font-size: 12px; padding: 3px 10px; border-radius: 20px; border: 1px solid; }
+  .pill { font-family: var(--mono); font-size: 11px; padding: 3px 9px; border-radius: 20px; border: 1px solid; white-space: nowrap; }
   .pill.ok { background: var(--accent-dim); border-color: rgba(0,212,170,0.3); color: var(--accent); }
   .pill.warn { background: var(--warn-dim); border-color: rgba(255,107,74,0.35); color: var(--warn); }
   .pill.grey { background: rgba(90,104,128,0.12); border-color: var(--border); color: var(--muted); }
 
   .btn-icon {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 13px;
-    padding: 6px 9px;
-    border-radius: 7px;
-    cursor: pointer;
-    touch-action: manipulation;
-    flex-shrink: 0;
-    line-height: 1;
-    transition: all 0.15s;
+    background: transparent; border: 1px solid var(--border); color: var(--muted);
+    font-size: 13px; padding: 6px 9px; border-radius: 7px; cursor: pointer;
+    touch-action: manipulation; flex-shrink: 0; line-height: 1; min-width: 34px;
+    text-align: center; transition: all 0.15s;
   }
   .btn-icon:active { border-color: var(--accent); color: var(--accent); }
   .btn-icon.del:active { border-color: var(--warn); color: var(--warn); }
 
-  .tray-body { display: none; padding: 14px 16px 16px; flex-direction: column; gap: 10px; }
+  /* ── Tray body ── */
+  .tray-body { display: none; padding: 12px 14px 14px; flex-direction: column; gap: 10px; }
   .tray-card.open .tray-body { display: flex; }
 
   /* Add instrument form */
-  .add-instrument-form { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .add-instrument-form {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+    padding: 13px; display: flex; flex-direction: column; gap: 9px;
+  }
 
   .add-instrument-form input {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 15px;
-    padding: 10px 12px;
-    outline: none;
-    appearance: none;
-    transition: border-color 0.2s;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 7px;
+    color: var(--text); font-family: var(--mono); font-size: 16px; padding: 10px 12px;
+    outline: none; appearance: none; transition: border-color 0.2s; width: 100%;
   }
   .add-instrument-form input:focus { border-color: var(--accent); }
-  .add-instrument-form input::placeholder { color: var(--muted); }
+  .add-instrument-form input::placeholder { color: var(--muted); font-size: 13px; }
 
   .form-row-inner { display: flex; gap: 8px; }
-  .input-name { width: 100%; }
   .input-serial { flex: 1; min-width: 0; }
-  .input-uses { width: 80px; flex-shrink: 0; }
+  .input-uses { width: 76px; flex-shrink: 0; }
 
   .btn-inst-add {
-    width: 100%;
-    background: rgba(0,212,170,0.1);
-    border: 1px solid rgba(0,212,170,0.25);
-    color: var(--accent);
-    border-radius: 8px;
-    font-family: var(--sans);
-    font-size: 14px;
-    font-weight: 600;
-    padding: 11px;
-    cursor: pointer;
-    touch-action: manipulation;
+    width: 100%; background: rgba(0,212,170,0.1); border: 1px solid rgba(0,212,170,0.25);
+    color: var(--accent); border-radius: 8px; font-family: var(--sans); font-size: 14px;
+    font-weight: 600; padding: 12px; cursor: pointer; touch-action: manipulation;
     transition: background 0.15s;
   }
   .btn-inst-add:active { background: rgba(0,212,170,0.2); }
   .btn-inst-add:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  /* Instrument rows */
+  /* ── Instrument rows ── */
   .instrument-list { display: flex; flex-direction: column; gap: 8px; }
 
-  .inst-row { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+  .inst-row {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 13px;
+  }
   .inst-row.low { border-color: rgba(255,107,74,0.3); }
   .inst-row.depleted { opacity: 0.55; }
 
-  .inst-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 10px; }
-  .inst-info { flex: 1; min-width: 0; }
+  /* Instrument name row */
+  .inst-name-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 3px; }
 
-  /* Inline edit for instrument name */
-  .inst-name-display { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+  .inst-name-display { font-size: 15px; font-weight: 500; word-break: break-word; flex: 1; }
   .inst-name-input {
-    font-size: 14px;
-    font-weight: 500;
-    font-family: var(--sans);
-    background: var(--bg);
-    border: 1px solid var(--accent);
-    border-radius: 5px;
-    color: var(--text);
-    padding: 3px 7px;
-    outline: none;
-    width: 100%;
-    margin-bottom: 2px;
-    display: none;
+    font-size: 14px; font-weight: 500; font-family: var(--sans);
+    background: var(--bg); border: 1px solid var(--accent); border-radius: 5px;
+    color: var(--text); padding: 4px 8px; outline: none; flex: 1; min-width: 0; display: none;
   }
-  .inst-info.editing .inst-name-display { display: none; }
-  .inst-info.editing .inst-name-input { display: block; }
+  .inst-name-wrap { display: flex; flex: 1; min-width: 0; }
+  .inst-name-wrap.editing .inst-name-display { display: none; }
+  .inst-name-wrap.editing .inst-name-input { display: block; width: 100%; }
 
-  .inst-serial { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.4px; }
-
-  /* Use log under instrument */
-  .inst-log { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
-  .log-entry {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    background: var(--bg);
-    border-radius: 5px;
-    padding: 5px 8px;
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-  }
-  .log-entry .log-user { color: var(--mid); font-weight: 500; }
-  .log-entry .log-time { color: var(--muted); font-size: 10px; }
-  .log-toggle {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 2px 0;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-    margin-top: 2px;
-  }
-
+  /* Big uses number — right aligned */
   .inst-uses { display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0; }
-  .inst-uses-num { font-family: var(--mono); font-size: 24px; font-weight: 500; line-height: 1; }
+  .inst-uses-num { font-family: var(--mono); font-size: 28px; font-weight: 500; line-height: 1; }
   .inst-uses-num.ok { color: var(--accent); }
   .inst-uses-num.low { color: var(--warn); }
   .inst-uses-num.depleted { color: var(--muted); text-decoration: line-through; }
-  .inst-uses-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+  .inst-uses-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; text-align: right; }
+
+  .inst-serial { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.4px; margin-bottom: 8px; }
+
+  .tag-depleted {
+    display: inline-block; background: rgba(90,104,128,0.13); border: 1px solid var(--border);
+    color: var(--muted); font-size: 9px; font-family: var(--mono); padding: 2px 6px;
+    border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+  }
 
   .inst-bar-wrap { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 10px; }
   .inst-bar { height: 100%; border-radius: 2px; transition: width 0.4s; }
@@ -372,36 +259,31 @@
   .inst-bar.low { background: var(--warn); }
   .inst-bar.depleted { background: var(--muted); }
 
-  .inst-actions { display: flex; gap: 8px; }
+  /* Action row — End Case full width, then small icons */
+  .inst-actions { display: flex; gap: 8px; align-items: stretch; }
 
   .btn-end-case {
-    flex: 1;
-    background: var(--warn-dim);
-    border: 1px solid rgba(255,107,74,0.3);
-    color: var(--warn);
-    font-family: var(--sans);
-    font-size: 13px;
-    font-weight: 600;
-    padding: 11px;
-    border-radius: 7px;
-    cursor: pointer;
-    touch-action: manipulation;
+    flex: 1; background: var(--warn-dim); border: 1px solid rgba(255,107,74,0.3);
+    color: var(--warn); font-family: var(--sans); font-size: 14px; font-weight: 600;
+    padding: 12px 10px; border-radius: 8px; cursor: pointer; touch-action: manipulation;
+    transition: background 0.15s; white-space: nowrap;
   }
   .btn-end-case:active:not(:disabled) { background: rgba(255,107,74,0.22); }
   .btn-end-case:disabled { opacity: 0.28; cursor: not-allowed; }
 
-  .tag-depleted {
-    display: inline-block;
-    background: rgba(90,104,128,0.13);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 9px;
-    font-family: var(--mono);
-    padding: 2px 6px;
-    border-radius: 3px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-top: 2px;
+  /* Use log */
+  .inst-log { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+  .log-entry {
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+    background: var(--bg); border-radius: 5px; padding: 6px 9px;
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .log-user { color: var(--mid); font-weight: 500; font-size: 12px; }
+  .log-time { color: var(--muted); font-size: 10px; }
+  .log-toggle {
+    font-family: var(--mono); font-size: 10px; color: var(--muted); background: none;
+    border: none; cursor: pointer; padding: 4px 0; text-decoration: underline;
+    text-underline-offset: 2px; text-align: left; touch-action: manipulation;
   }
 
   .inst-empty { text-align: center; padding: 20px; color: var(--muted); font-size: 13px; }
@@ -410,76 +292,46 @@
   .empty-trays .icon { font-size: 38px; margin-bottom: 12px; opacity: 0.3; }
   .empty-trays p { font-size: 14px; line-height: 1.7; }
 
-  /* Toast */
+  /* ── Toast ── */
   .toast {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
+    position: fixed; bottom: 24px; left: 50%;
     transform: translateX(-50%) translateY(16px);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--accent);
-    border-radius: 10px;
-    padding: 12px 20px;
-    font-size: 13px;
-    color: var(--text);
-    font-family: var(--mono);
-    opacity: 0;
-    transition: all 0.25s ease;
-    pointer-events: none;
-    z-index: 200;
-    white-space: nowrap;
-    max-width: calc(100vw - 32px);
-    overflow: hidden;
-    text-overflow: ellipsis;
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent); border-radius: 10px;
+    padding: 12px 20px; font-size: 13px; color: var(--text); font-family: var(--mono);
+    opacity: 0; transition: all 0.25s ease; pointer-events: none; z-index: 200;
+    white-space: nowrap; max-width: calc(100vw - 32px); overflow: hidden; text-overflow: ellipsis;
   }
   .toast.warn { border-left-color: var(--warn); }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-  /* Modals */
+  /* ── Modals ── */
   .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.78);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    z-index: 300;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s;
+    position: fixed; inset: 0; background: rgba(0,0,0,0.78);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    z-index: 300; display: flex; align-items: flex-end; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
   }
   .modal-overlay.open { opacity: 1; pointer-events: all; }
 
   .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px 20px 0 0;
-    padding: 20px 20px 44px;
-    width: 100%;
-    max-width: 680px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px 20px 0 0; padding: 20px 20px 48px;
+    width: 100%; max-width: 680px;
     transform: translateY(100%);
     transition: transform 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
   }
   .modal-overlay.open .modal { transform: translateY(0); }
 
   .modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 20px; }
-  .modal-eyebrow { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 5px; }
-  .modal-title { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  .modal-eyebrow { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 4px; }
+  .modal-title { font-size: 20px; font-weight: 600; margin-bottom: 3px; word-break: break-word; }
   .modal-subtitle { font-family: var(--mono); font-size: 12px; color: var(--accent); margin-bottom: 16px; }
   .modal-body-text { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
 
   .modal-uses-row {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 16px;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px;
   }
   .modal-uses-block { flex: 1; text-align: center; }
   .modal-uses-sub { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
@@ -489,31 +341,15 @@
   .modal-uses-val.after { color: var(--warn); }
   .modal-arrow { font-size: 20px; color: var(--muted); flex-shrink: 0; }
 
-  /* Name field inside deduct modal */
-  .modal-name-field {
-    margin-bottom: 16px;
-  }
+  .modal-name-field { margin-bottom: 16px; }
   .modal-name-field label {
-    display: block;
-    font-family: var(--mono);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    color: var(--muted);
-    margin-bottom: 7px;
+    display: block; font-family: var(--mono); font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.8px; color: var(--muted); margin-bottom: 7px;
   }
   .modal-name-field input {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    color: var(--text);
-    font-family: var(--sans);
-    font-size: 16px;
-    padding: 13px 14px;
-    outline: none;
-    appearance: none;
-    transition: border-color 0.2s;
+    width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 9px;
+    color: var(--text); font-family: var(--sans); font-size: 16px; padding: 13px 14px;
+    outline: none; appearance: none; transition: border-color 0.2s;
   }
   .modal-name-field input:focus { border-color: var(--accent); }
   .modal-name-field input::placeholder { color: var(--muted); }
@@ -522,39 +358,25 @@
   .modal-btns { display: flex; flex-direction: column; gap: 10px; }
 
   .btn-modal-confirm {
-    background: var(--warn);
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    font-family: var(--sans);
-    font-size: 16px;
-    font-weight: 600;
-    padding: 16px;
-    cursor: pointer;
-    touch-action: manipulation;
-    transition: transform 0.1s;
+    background: var(--warn); color: #fff; border: none; border-radius: 12px;
+    font-family: var(--sans); font-size: 16px; font-weight: 600; padding: 16px;
+    cursor: pointer; touch-action: manipulation; transition: transform 0.1s;
   }
   .btn-modal-confirm:active { transform: scale(0.98); }
   .btn-modal-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
   .btn-modal-confirm.grey { background: #2e3a4e; color: var(--mid); }
 
   .btn-modal-cancel {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    border-radius: 12px;
-    font-family: var(--sans);
-    font-size: 16px;
-    padding: 16px;
-    cursor: pointer;
-    touch-action: manipulation;
+    background: transparent; border: 1px solid var(--border); color: var(--muted);
+    border-radius: 12px; font-family: var(--sans); font-size: 16px; padding: 16px;
+    cursor: pointer; touch-action: manipulation;
   }
   .btn-modal-cancel:active { background: var(--border); }
 </style>
 </head>
 <body>
 
-<!-- Lock screen — always shown on load -->
+<!-- Lock screen — always shown on page load -->
 <div id="lock-screen">
   <div class="lock-box">
     <div class="lock-icon">🔒</div>
@@ -608,7 +430,7 @@
 </div>
 </div>
 
-<!-- End Case modal (with name field) -->
+<!-- End Case modal -->
 <div class="modal-overlay" id="modal-deduct" onclick="closeModal('modal-deduct')">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
@@ -668,7 +490,6 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  // ── Supabase ──────────────────────────────────────────────────────────
   const { createClient } = supabase;
   const sb = createClient(
     'https://zmyxcrdygechxnjxxzqr.supabase.co',
@@ -700,11 +521,8 @@
 
   // ── State ─────────────────────────────────────────────────────────────
   let trays = [];
-  // Track which trays are open in memory only (resets on page load — fine)
   const openTrays = new Set();
-
-  // Per-instrument log visibility
-  const showLog = new Set();
+  const showLog   = new Set();
 
   // ── Loading ───────────────────────────────────────────────────────────
   function setLoading(on) {
@@ -720,7 +538,7 @@
   }
 
   // ── Modals ────────────────────────────────────────────────────────────
-  function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
+  function openModal(id)  { document.getElementById(id).classList.add('open');    document.body.style.overflow = 'hidden'; }
   function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow = ''; }
 
   // ── Helpers ───────────────────────────────────────────────────────────
@@ -733,16 +551,14 @@
       + ' ' + d.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
   }
 
-  // ── Load data ─────────────────────────────────────────────────────────
+  // ── Load ─────────────────────────────────────────────────────────────
   async function loadData() {
     setLoading(true);
     try {
       const { data: trayRows, error: e1 } = await sb.from('trays').select('*').order('created_at');
       if (e1) throw e1;
-
       const { data: instRows, error: e2 } = await sb.from('instruments').select('*').order('created_at');
       if (e2) throw e2;
-
       const { data: logRows, error: e3 } = await sb.from('use_log').select('*').order('used_at', { ascending: false });
       if (e3) throw e3;
 
@@ -750,19 +566,12 @@
         ...t,
         instruments: instRows
           .filter(i => i.tray_id === t.id)
-          .map(i => ({
-            ...i,
-            log: logRows.filter(l => l.instrument_id === i.id)
-          }))
+          .map(i => ({ ...i, log: logRows.filter(l => l.instrument_id === i.id) }))
       }));
-
       render();
     } catch (err) {
-      toast('Failed to load data. Check connection.', 'warn');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+      toast('Failed to load data.', 'warn'); console.error(err);
+    } finally { setLoading(false); }
   }
 
   // ── Add tray ──────────────────────────────────────────────────────────
@@ -779,38 +588,35 @@
       if (error) throw error;
       openTrays.add(data.id);
       trays.push({ ...data, instruments: [] });
-      render();
-      toast(`${name} added`);
+      render(); toast(`${name} added`);
       document.getElementById('input-tray-name').value = '';
     } catch (err) {
       toast('Failed to add tray.', 'warn'); console.error(err);
-    } finally {
-      btn.disabled = false; setLoading(false);
-    }
+    } finally { btn.disabled = false; setLoading(false); }
   }
 
-  // ── Rename tray (inline) ──────────────────────────────────────────────
+  // ── Rename tray ───────────────────────────────────────────────────────
   function startRenameTray(trayId, e) {
     e.stopPropagation();
     const wrap = document.querySelector(`#tray-${trayId} .tray-name-wrap`);
     const inp  = wrap.querySelector('.tray-name-input');
     const tray = trays.find(t => t.id === trayId);
-    inp.value = tray.name;
+    inp.value  = tray.name;
     wrap.classList.add('editing');
     inp.focus(); inp.select();
 
-    function finish() {
+    const finish = () => {
       inp.removeEventListener('blur', finish);
       inp.removeEventListener('keydown', onKey);
       const newName = inp.value.trim();
       wrap.classList.remove('editing');
       if (!newName || newName === tray.name) { render(); return; }
       renameTray(trayId, newName);
-    }
-    function onKey(e) {
-      if (e.key === 'Enter') { inp.blur(); }
+    };
+    const onKey = e => {
+      if (e.key === 'Enter') inp.blur();
       if (e.key === 'Escape') { inp.value = tray.name; inp.blur(); }
-    }
+    };
     inp.addEventListener('blur', finish);
     inp.addEventListener('keydown', onKey);
   }
@@ -821,8 +627,7 @@
       const { error } = await sb.from('trays').update({ name: newName }).eq('id', trayId);
       if (error) throw error;
       trays.find(t => t.id === trayId).name = newName;
-      render();
-      toast('Tray renamed.');
+      render(); toast('Tray renamed.');
     } catch (err) {
       toast('Failed to rename tray.', 'warn'); console.error(err);
     } finally { setLoading(false); }
@@ -875,7 +680,6 @@
 
     const btn = document.querySelector(`#tray-${trayId} .btn-inst-add`);
     if (btn) btn.disabled = true; setLoading(true);
-
     try {
       const { data, error } = await sb.from('instruments')
         .insert({ tray_id: trayId, name, serial, max_uses: uses, uses })
@@ -885,33 +689,31 @@
       render(); toast(`${name} added to ${tray.name}`);
     } catch (err) {
       toast('Failed to add instrument.', 'warn'); console.error(err);
-    } finally {
-      if (btn) btn.disabled = false; setLoading(false);
-    }
+    } finally { if (btn) btn.disabled = false; setLoading(false); }
   }
 
-  // ── Rename instrument (inline) ────────────────────────────────────────
+  // ── Rename instrument ─────────────────────────────────────────────────
   function startRenameInst(trayId, instId, e) {
     e.stopPropagation();
-    const infoEl = document.querySelector(`[data-inst-id="${instId}"] .inst-info`);
-    const inp    = infoEl.querySelector('.inst-name-input');
-    const inst   = trays.find(t => t.id === trayId).instruments.find(i => i.id === instId);
-    inp.value = inst.name;
-    infoEl.classList.add('editing');
+    const wrap = document.querySelector(`[data-inst-id="${instId}"] .inst-name-wrap`);
+    const inp  = wrap.querySelector('.inst-name-input');
+    const inst = trays.find(t => t.id === trayId).instruments.find(i => i.id === instId);
+    inp.value  = inst.name;
+    wrap.classList.add('editing');
     inp.focus(); inp.select();
 
-    function finish() {
+    const finish = () => {
       inp.removeEventListener('blur', finish);
       inp.removeEventListener('keydown', onKey);
       const newName = inp.value.trim();
-      infoEl.classList.remove('editing');
+      wrap.classList.remove('editing');
       if (!newName || newName === inst.name) { render(); return; }
       renameInstrument(instId, newName);
-    }
-    function onKey(e) {
+    };
+    const onKey = e => {
       if (e.key === 'Enter') inp.blur();
       if (e.key === 'Escape') { inp.value = inst.name; inp.blur(); }
-    }
+    };
     inp.addEventListener('blur', finish);
     inp.addEventListener('keydown', onKey);
   }
@@ -924,7 +726,7 @@
       trays.forEach(t => { const i = t.instruments.find(i => i.id === instId); if (i) i.name = newName; });
       render(); toast('Instrument renamed.');
     } catch (err) {
-      toast('Failed to rename instrument.', 'warn'); console.error(err);
+      toast('Failed to rename.', 'warn'); console.error(err);
     } finally { setLoading(false); }
   }
 
@@ -935,15 +737,14 @@
 
     document.getElementById('md-name').textContent   = inst.name;
     document.getElementById('md-serial').textContent = inst.serial;
-
     const cur = document.getElementById('md-current');
     cur.textContent = inst.uses;
     cur.className = 'modal-uses-val ' + (inst.uses <= 2 ? 'low' : 'ok');
     document.getElementById('md-after').textContent = inst.uses - 1;
 
     const nameInput = document.getElementById('md-user-name');
-    nameInput.value = '';
-    nameInput.classList.remove('error');
+    nameInput.value = ''; nameInput.classList.remove('error');
+    nameInput.placeholder = 'e.g. Dr. Smith';
 
     const confirmBtn = document.getElementById('md-confirm');
     confirmBtn.disabled = false;
@@ -958,22 +759,18 @@
     if (!userName) {
       nameInput.classList.add('error');
       nameInput.placeholder = 'Please enter your name';
-      nameInput.focus();
-      return;
+      nameInput.focus(); return;
     }
-    nameInput.classList.remove('error');
 
     const inst = trays.find(t => t.id === trayId).instruments.find(i => i.id === instId);
     if (!inst || inst.uses <= 0) return;
 
     document.getElementById('md-confirm').disabled = true;
     setLoading(true);
-
     try {
       const newUses = inst.uses - 1;
       const { error: e1 } = await sb.from('instruments').update({ uses: newUses }).eq('id', instId);
       if (e1) throw e1;
-
       const { data: logEntry, error: e2 } = await sb.from('use_log')
         .insert({ instrument_id: instId, used_by: userName })
         .select().single();
@@ -981,7 +778,6 @@
 
       inst.uses = newUses;
       inst.log.unshift(logEntry);
-
       closeModal('modal-deduct');
       render();
 
@@ -1012,11 +808,11 @@
       tray.instruments = tray.instruments.filter(i => i.id !== instId);
       render(); toast('Instrument removed.');
     } catch (err) {
-      toast('Failed to remove instrument.', 'warn'); console.error(err);
+      toast('Failed to remove.', 'warn'); console.error(err);
     } finally { setLoading(false); }
   }
 
-  // ── Toggle log visibility ─────────────────────────────────────────────
+  // ── Toggle log ────────────────────────────────────────────────────────
   function toggleLog(instId) {
     if (showLog.has(instId)) showLog.delete(instId); else showLog.add(instId);
     render();
@@ -1050,7 +846,7 @@
       const pillClass = depleted > 0 ? 'warn' : allUses === 0 && tray.instruments.length > 0 ? 'grey' : 'ok';
       const pillText  = tray.instruments.length === 0
         ? '0 instruments'
-        : `${allUses} uses · ${depleted} depleted`;
+        : `${allUses} uses · ${depleted} dep.`;
 
       const instrHtml = tray.instruments.length === 0
         ? `<div class="inst-empty">No instruments yet — add one below.</div>`
@@ -1066,30 +862,30 @@
               </div>`;
             const logToggle = inst.log.length === 0 ? '' : `
               <button class="log-toggle" onclick="toggleLog(${inst.id})">
-                ${logVisible ? 'Hide log' : `Show log (${inst.log.length})`}
+                ${logVisible ? 'Hide log' : `Show use log (${inst.log.length})`}
               </button>`;
 
             return `
               <div class="inst-row ${cls(inst)}" data-inst-id="${inst.id}">
-                <div class="inst-top">
-                  <div class="inst-info">
+                <div class="inst-name-row">
+                  <div class="inst-name-wrap">
                     <div class="inst-name-display">${inst.name}</div>
                     <input class="inst-name-input" type="text" value="${inst.name}" autocomplete="off" />
-                    <div class="inst-serial">${inst.serial}</div>
-                    ${inst.uses === 0 ? '<span class="tag-depleted">depleted</span>' : ''}
-                    ${logToggle}
                   </div>
                   <div class="inst-uses">
                     <div class="inst-uses-num ${cls(inst)}">${inst.uses}</div>
                     <div class="inst-uses-label">uses left</div>
                   </div>
                 </div>
+                <div class="inst-serial">${inst.serial}</div>
+                ${inst.uses === 0 ? '<span class="tag-depleted">depleted</span>' : ''}
+                ${logToggle}
                 ${logHtml}
                 <div class="inst-bar-wrap">
                   <div class="inst-bar ${cls(inst)}" style="width:${pct(inst)}%"></div>
                 </div>
                 <div class="inst-actions">
-                  <button class="btn-end-case" onclick="promptDeduct(${tray.id},${inst.id})" ${inst.uses === 0 ? 'disabled' : ''}> End Procedure</button>
+                  <button class="btn-end-case" onclick="promptDeduct(${tray.id},${inst.id})" ${inst.uses === 0 ? 'disabled' : ''}>− End Case</button>
                   <button class="btn-icon" onclick="startRenameInst(${tray.id},${inst.id},event)" title="Rename">✏️</button>
                   <button class="btn-icon del" onclick="promptDeleteInst(${tray.id},${inst.id})">✕</button>
                 </div>
@@ -1100,18 +896,20 @@
       return `
         <div class="tray-card ${isOpen ? 'open' : ''}" id="tray-${tray.id}">
           <div class="tray-header" onclick="toggleTray(${tray.id})">
-            <div class="tray-header-left">
+            <div class="tray-header-row1">
               <span class="tray-chevron">▶</span>
               <div class="tray-name-wrap">
                 <div class="tray-name-display">${tray.name}</div>
                 <input class="tray-name-input" type="text" value="${tray.name}" autocomplete="off" />
-                <div class="tray-meta">${tray.instruments.length} instrument${tray.instruments.length !== 1 ? 's' : ''}</div>
               </div>
             </div>
-            <div class="tray-header-actions">
-              <span class="pill ${pillClass}">${pillText}</span>
-              <button class="btn-icon" onclick="startRenameTray(${tray.id},event)" title="Rename">✏️</button>
-              <button class="btn-icon del" onclick="promptDeleteTray(${tray.id},event)">✕</button>
+            <div class="tray-header-row2">
+              <div class="tray-meta">${tray.instruments.length} instrument${tray.instruments.length !== 1 ? 's' : ''}</div>
+              <div class="tray-header-btns">
+                <span class="pill ${pillClass}">${pillText}</span>
+                <button class="btn-icon" onclick="startRenameTray(${tray.id},event)" title="Rename">✏️</button>
+                <button class="btn-icon del" onclick="promptDeleteTray(${tray.id},event)">✕</button>
+              </div>
             </div>
           </div>
           <div class="tray-body">
