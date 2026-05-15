@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>OR Equipment Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --bg: #0a0e14;
+    --surface: #111620;
+    --surface2: #161d2a;
+    --border: #1e2736;
+    --accent: #00d4aa;
+    --accent-dim: rgba(0,212,170,0.12);
+    --warn: #ff6b4a;
+    --warn-dim: rgba(255,107,74,0.12);
+    --text: #e8edf5;
+    --muted: #5a6880;
+    --mid: #8a9ab5;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html { font-size: 16px; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,170,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,170,0.025) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Lock screen ── */
+  #lock-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 24px;
+  }
+  #lock-screen.hidden { display: none; }
+
+  .lock-box {
+    width: 100%;
+    max-width: 340px;
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+
+  .lock-icon { font-size: 40px; margin-bottom: 18px; }
+  .lock-title { font-family: var(--mono); font-size: 19px; font-weight: 500; margin-bottom: 6px; }
+  .lock-subtitle { font-size: 13px; color: var(--muted); margin-bottom: 32px; line-height: 1.5; }
+
+  .lock-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 20px;
+    padding: 16px;
+    outline: none;
+    text-align: center;
+    letter-spacing: 3px;
+    appearance: none;
+    transition: border-color 0.2s;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .lock-input:focus { border-color: var(--accent); }
+  .lock-input.error { border-color: var(--warn); animation: shake 0.3s ease; }
+  .lock-input::placeholder { letter-spacing: 0; color: var(--muted); font-size: 14px; }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+  }
+
+  .lock-error { font-size: 13px; color: var(--warn); font-family: var(--mono); min-height: 20px; margin-bottom: 14px; }
+
+  .lock-btn {
+    width: 100%;
+    background: var(--accent);
+    color: #0a0e14;
+    border: none;
+    border-radius: 12px;
+    font-family: var(--sans);
+    font-size: 16px;
+    font-weight: 600;
+    padding: 16px;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .lock-btn:active { transform: scale(0.98); background: #00c49d; }
+
+  /* ── App ── */
+  #app { padding: 24px 16px 100px; display: none; }
+  .container { max-width: 680px; margin: 0 auto; position: relative; z-index: 1; }
+
+  /* ── Header ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-left h1 { font-family: var(--mono); font-size: 18px; font-weight: 500; }
+  .header-left .subtitle { font-size: 11px; color: var(--muted); margin-top: 3px; letter-spacing: 0.6px; text-transform: uppercase; }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+
+  .badge {
+    background: var(--accent-dim);
+    border: 1px solid rgba(0,212,170,0.3);
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 4px 9px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-lock {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    touch-action: manipulation;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    transition: all 0.15s;
+  }
+  .btn-lock:active { border-color: var(--accent); color: var(--accent); }
+
+  /* ── Stats ── */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 10px; text-align: center; }
+  .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); margin-bottom: 5px; }
+  .stat-value { font-family: var(--mono); font-size: 26px; font-weight: 500; line-height: 1; }
+  .stat-value.accent { color: var(--accent); }
+  .stat-value.warn { color: var(--warn); }
+
+  /* ── Loading ── */
+  .loading-bar {
+    height: 2px;
+    background: var(--border);
+    border-radius: 1px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .loading-bar-inner {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 1px;
+    animation: loading 1.2s ease-in-out infinite;
+  }
+  @keyframes loading {
+    0% { width: 0%; margin-left: 0; }
+    50% { width: 60%; margin-left: 20%; }
+    100% { width: 0%; margin-left: 100%; }
+  }
+  .loading-bar.hidden { display: none; }
+
+  /* ── Add Tray ── */
+  .add-tray-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 20px; }
+  .panel-label { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 12px; }
+  .add-tray-row { display: flex; gap: 10px; }
+
+  .add-tray-row input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 16px;
+    padding: 12px 14px;
+    outline: none;
+    appearance: none;
+    transition: border-color 0.2s;
+  }
+  .add-tray-row input:focus { border-color: var(--accent); }
+  .add-tray-row input::placeholder { color: var(--muted); }
+
+  .btn-tray-add {
+    background: var(--accent);
+    color: #0a0e14;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 600;
+    padding: 12px 18px;
+    cursor: pointer;
+    white-space: nowrap;
+    touch-action: manipulation;
+    transition: background 0.15s, transform 0.1s;
+    flex-shrink: 0;
+  }
+  .btn-tray-add:active { transform: scale(0.97); background: #00c49d; }
+  .btn-tray-add:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ── Tray cards ── */
+  .trays { display: flex; flex-direction: column; gap: 14px; }
+
+  .tray-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+
+  .tray-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    cursor: pointer;
+    user-select: none;
+    gap: 10px;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s;
+  }
+  .tray-card.open .tray-header { border-bottom-color: var(--border); }
+
+  .tray-header-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+
+  .tray-chevron { color: var(--muted); font-size: 12px; transition: transform 0.25s; flex-shrink: 0; }
+  .tray-card.open .tray-chevron { transform: rotate(90deg); }
+
+  .tray-name-wrap { min-width: 0; }
+  .tray-name { font-size: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tray-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .tray-pills { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  .pill { font-family: var(--mono); font-size: 12px; padding: 3px 10px; border-radius: 20px; border: 1px solid; }
+  .pill.ok { background: var(--accent-dim); border-color: rgba(0,212,170,0.3); color: var(--accent); }
+  .pill.warn { background: var(--warn-dim); border-color: rgba(255,107,74,0.35); color: var(--warn); }
+  .pill.grey { background: rgba(90,104,128,0.12); border-color: var(--border); color: var(--muted); }
+
+  .btn-tray-delete {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 14px;
+    padding: 6px 9px;
+    border-radius: 7px;
+    cursor: pointer;
+    touch-action: manipulation;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+  .btn-tray-delete:active { border-color: var(--warn); color: var(--warn); }
+
+  .tray-body { display: none; padding: 14px 16px 16px; flex-direction: column; gap: 10px; }
+  .tray-card.open .tray-body { display: flex; }
+
+  /* Add instrument form */
+  .add-instrument-form { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+
+  .add-instrument-form input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 15px;
+    padding: 10px 12px;
+    outline: none;
+    appearance: none;
+    transition: border-color 0.2s;
+  }
+  .add-instrument-form input:focus { border-color: var(--accent); }
+  .add-instrument-form input::placeholder { color: var(--muted); }
+
+  .form-row-inner { display: flex; gap: 8px; }
+  .input-name { width: 100%; }
+  .input-serial { flex: 1; min-width: 0; }
+  .input-uses { width: 80px; flex-shrink: 0; }
+
+  .btn-inst-add {
+    width: 100%;
+    background: rgba(0,212,170,0.1);
+    border: 1px solid rgba(0,212,170,0.25);
+    color: var(--accent);
+    border-radius: 8px;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 11px;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: background 0.15s;
+  }
+  .btn-inst-add:active { background: rgba(0,212,170,0.2); }
+  .btn-inst-add:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* Instrument rows */
+  .instrument-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .inst-row { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+  .inst-row.low { border-color: rgba(255,107,74,0.3); }
+  .inst-row.depleted { opacity: 0.55; }
+
+  .inst-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 10px; }
+  .inst-info { flex: 1; min-width: 0; }
+  .inst-name { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+  .inst-serial { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.4px; }
+
+  .inst-uses { display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0; }
+  .inst-uses-num { font-family: var(--mono); font-size: 24px; font-weight: 500; line-height: 1; }
+  .inst-uses-num.ok { color: var(--accent); }
+  .inst-uses-num.low { color: var(--warn); }
+  .inst-uses-num.depleted { color: var(--muted); text-decoration: line-through; }
+  .inst-uses-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+  .inst-bar-wrap { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 10px; }
+  .inst-bar { height: 100%; border-radius: 2px; transition: width 0.4s; }
+  .inst-bar.ok { background: var(--accent); }
+  .inst-bar.low { background: var(--warn); }
+  .inst-bar.depleted { background: var(--muted); }
+
+  .inst-actions { display: flex; gap: 8px; }
+
+  .btn-end-case {
+    flex: 1;
+    background: var(--warn-dim);
+    border: 1px solid rgba(255,107,74,0.3);
+    color: var(--warn);
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 11px;
+    border-radius: 7px;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: background 0.15s;
+  }
+  .btn-end-case:active:not(:disabled) { background: rgba(255,107,74,0.22); }
+  .btn-end-case:disabled { opacity: 0.28; cursor: not-allowed; }
+
+  .btn-inst-del {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 14px;
+    padding: 11px 13px;
+    border-radius: 7px;
+    cursor: pointer;
+    touch-action: manipulation;
+    line-height: 1;
+  }
+  .btn-inst-del:active { border-color: var(--warn); color: var(--warn); }
+
+  .tag-depleted {
+    display: inline-block;
+    background: rgba(90,104,128,0.13);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 9px;
+    font-family: var(--mono);
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+  }
+
+  .inst-empty { text-align: center; padding: 20px; color: var(--muted); font-size: 13px; }
+
+  .empty-trays { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .empty-trays .icon { font-size: 38px; margin-bottom: 12px; opacity: 0.3; }
+  .empty-trays p { font-size: 14px; line-height: 1.7; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(16px);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-size: 13px;
+    color: var(--text);
+    font-family: var(--mono);
+    opacity: 0;
+    transition: all 0.25s ease;
+    pointer-events: none;
+    z-index: 200;
+    white-space: nowrap;
+    max-width: calc(100vw - 32px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .toast.warn { border-left-color: var(--warn); }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Modals */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.78);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 300;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px 20px 0 0;
+    padding: 20px 20px 44px;
+    width: 100%;
+    max-width: 680px;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+
+  .modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 20px; }
+  .modal-eyebrow { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 5px; }
+  .modal-title { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  .modal-subtitle { font-family: var(--mono); font-size: 12px; color: var(--accent); margin-bottom: 16px; }
+  .modal-body-text { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+
+  .modal-uses-row {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .modal-uses-block { flex: 1; text-align: center; }
+  .modal-uses-sub { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .modal-uses-val { font-family: var(--mono); font-size: 28px; font-weight: 500; }
+  .modal-uses-val.ok { color: var(--accent); }
+  .modal-uses-val.low { color: var(--warn); }
+  .modal-uses-val.after { color: var(--warn); }
+  .modal-arrow { font-size: 20px; color: var(--muted); flex-shrink: 0; }
+
+  .modal-btns { display: flex; flex-direction: column; gap: 10px; }
+
+  .btn-modal-confirm {
+    background: var(--warn);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-family: var(--sans);
+    font-size: 16px;
+    font-weight: 600;
+    padding: 16px;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: transform 0.1s;
+  }
+  .btn-modal-confirm:active { transform: scale(0.98); }
+  .btn-modal-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-modal-confirm.grey { background: #2e3a4e; color: var(--mid); }
+
+  .btn-modal-cancel {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 12px;
+    font-family: var(--sans);
+    font-size: 16px;
+    padding: 16px;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  .btn-modal-cancel:active { background: var(--border); }
+</style>
+</head>
+<body>
+
+<!-- Lock screen -->
+<div id="lock-screen">
+  <div class="lock-box">
+    <div class="lock-icon">🔒</div>
+    <div class="lock-title">OR Equipment Tracker</div>
+    <div class="lock-subtitle">Enter the access password to continue.</div>
+    <input class="lock-input" type="password" id="lock-input" placeholder="Password" autocomplete="off" />
+    <div class="lock-error" id="lock-error"></div>
+    <button class="lock-btn" onclick="checkPassword()">Unlock</button>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app">
+<div class="container">
+
+  <header>
+    <div class="header-left">
+      <h1>OR Tracker</h1>
+      <div class="subtitle">Tray & Instrument Log</div>
+    </div>
+    <div class="header-right">
+      <div class="badge">LIVE</div>
+      <button class="btn-lock" onclick="lockApp()">🔒 Lock</button>
+    </div>
+  </header>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-label">Trays</div>
+      <div class="stat-value" id="stat-trays">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Uses Left</div>
+      <div class="stat-value accent" id="stat-uses">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Depleted</div>
+      <div class="stat-value warn" id="stat-depleted">—</div>
+    </div>
+  </div>
+
+  <div class="loading-bar" id="loading-bar"><div class="loading-bar-inner"></div></div>
+
+  <div class="add-tray-panel">
+    <div class="panel-label">Add Tray</div>
+    <div class="add-tray-row">
+      <input type="text" id="input-tray-name" placeholder="e.g. Tray 1, Laparoscopy Set…" autocomplete="off" />
+      <button class="btn-tray-add" id="btn-add-tray" onclick="addTray()">+ Add</button>
+    </div>
+  </div>
+
+  <div class="trays" id="trays-container"></div>
+
+</div>
+</div>
+
+<!-- End Case modal -->
+<div class="modal-overlay" id="modal-deduct" onclick="closeModal('modal-deduct')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-eyebrow">End of Case — Deduct 1 Use</div>
+    <div class="modal-title" id="md-name"></div>
+    <div class="modal-subtitle" id="md-serial"></div>
+    <div class="modal-uses-row">
+      <div class="modal-uses-block">
+        <div class="modal-uses-sub">Current</div>
+        <div class="modal-uses-val" id="md-current"></div>
+      </div>
+      <div class="modal-arrow">→</div>
+      <div class="modal-uses-block">
+        <div class="modal-uses-sub">After</div>
+        <div class="modal-uses-val after" id="md-after"></div>
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-modal-confirm" id="md-confirm">Confirm — Use 1 Life</button>
+      <button class="btn-modal-cancel" onclick="closeModal('modal-deduct')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete instrument modal -->
+<div class="modal-overlay" id="modal-del-inst" onclick="closeModal('modal-del-inst')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-eyebrow">Remove Instrument</div>
+    <div class="modal-title" id="di-name"></div>
+    <div class="modal-body-text" id="di-body"></div>
+    <div class="modal-btns">
+      <button class="btn-modal-confirm grey" id="di-confirm">Yes, Remove</button>
+      <button class="btn-modal-cancel" onclick="closeModal('modal-del-inst')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete tray modal -->
+<div class="modal-overlay" id="modal-del-tray" onclick="closeModal('modal-del-tray')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-eyebrow">Remove Tray</div>
+    <div class="modal-title" id="dt-name"></div>
+    <div class="modal-body-text" id="dt-body"></div>
+    <div class="modal-btns">
+      <button class="btn-modal-confirm grey" id="dt-confirm">Yes, Remove Tray</button>
+      <button class="btn-modal-cancel" onclick="closeModal('modal-del-tray')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── Supabase ────────────────────────────────────────────────────────
+  const { createClient } = supabase;
+  const sb = createClient(
+    'https://zmyxcrdygechxnjxxzqr.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpteXhjcmR5Z2VjaHhuanh4enFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NzA5NzAsImV4cCI6MjA5NDQ0Njk3MH0.fcR8G4aeQtMtcqhFnVuNIWS1neF7KucH0_gdcHpjYHQ'
+  );
+
+  // ── Auth ────────────────────────────────────────────────────────────
+  const PASSWORD = 'Barts2026';
+  const SESSION_KEY = 'or_unlocked';
+
+  function checkPassword() {
+    const val = document.getElementById('lock-input').value;
+    const inp = document.getElementById('lock-input');
+    const err = document.getElementById('lock-error');
+    if (val === PASSWORD) {
+      sessionStorage.setItem(SESSION_KEY, '1');
+      document.getElementById('lock-screen').classList.add('hidden');
+      document.getElementById('app').style.display = 'block';
+      loadData();
+    } else {
+      err.textContent = 'Incorrect password. Please try again.';
+      inp.classList.add('error');
+      inp.value = '';
+      setTimeout(() => inp.classList.remove('error'), 400);
+    }
+  }
+
+  function lockApp() {
+    sessionStorage.removeItem(SESSION_KEY);
+    document.getElementById('lock-screen').classList.remove('hidden');
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('lock-input').value = '';
+    document.getElementById('lock-error').textContent = '';
+  }
+
+  document.getElementById('lock-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') checkPassword();
+  });
+
+  if (sessionStorage.getItem(SESSION_KEY) === '1') {
+    document.getElementById('lock-screen').classList.add('hidden');
+    document.getElementById('app').style.display = 'block';
+  }
+
+  // ── State ───────────────────────────────────────────────────────────
+  // trays = [ { id, name, open, instruments: [...] } ]
+  let trays = [];
+  let openTrays = new Set(JSON.parse(sessionStorage.getItem('open_trays') || '[]'));
+
+  function saveOpenState() {
+    sessionStorage.setItem('open_trays', JSON.stringify([...openTrays]));
+  }
+
+  // ── Loading ─────────────────────────────────────────────────────────
+  function setLoading(on) {
+    document.getElementById('loading-bar').classList.toggle('hidden', !on);
+  }
+
+  // ── Toast ───────────────────────────────────────────────────────────
+  function toast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = 'toast ' + type;
+    void t.offsetWidth; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // ── Modals ──────────────────────────────────────────────────────────
+  function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow = ''; }
+
+  // ── Helpers ─────────────────────────────────────────────────────────
+  const cls = i => i.uses === 0 ? 'depleted' : i.uses <= 2 ? 'low' : 'ok';
+  const pct = i => i.max_uses > 0 ? (i.uses / i.max_uses) * 100 : 0;
+
+  // ── Load data ────────────────────────────────────────────────────────
+  async function loadData() {
+    setLoading(true);
+    try {
+      const { data: trayRows, error: e1 } = await sb.from('trays').select('*').order('created_at');
+      if (e1) throw e1;
+
+      const { data: instRows, error: e2 } = await sb.from('instruments').select('*').order('created_at');
+      if (e2) throw e2;
+
+      trays = trayRows.map(t => ({
+        ...t,
+        open: openTrays.has(t.id),
+        instruments: instRows.filter(i => i.tray_id === t.id)
+      }));
+
+      render();
+    } catch (err) {
+      toast('Failed to load data. Check connection.', 'warn');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ── Add tray ─────────────────────────────────────────────────────────
+  async function addTray() {
+    const name = document.getElementById('input-tray-name').value.trim();
+    if (!name) { toast('Enter a tray name.', 'warn'); return; }
+    if (trays.find(t => t.name.toLowerCase() === name.toLowerCase())) {
+      toast('A tray with that name already exists.', 'warn'); return;
+    }
+
+    const btn = document.getElementById('btn-add-tray');
+    btn.disabled = true;
+    setLoading(true);
+
+    try {
+      const { data, error } = await sb.from('trays').insert({ name }).select().single();
+      if (error) throw error;
+      openTrays.add(data.id);
+      saveOpenState();
+      trays.push({ ...data, open: true, instruments: [] });
+      render();
+      toast(`${name} added`);
+      document.getElementById('input-tray-name').value = '';
+    } catch (err) {
+      toast('Failed to add tray.', 'warn');
+      console.error(err);
+    } finally {
+      btn.disabled = false;
+      setLoading(false);
+    }
+  }
+
+  // ── Delete tray ──────────────────────────────────────────────────────
+  function promptDeleteTray(trayId) {
+    const tray = trays.find(t => t.id === trayId);
+    document.getElementById('dt-name').textContent = tray.name;
+    document.getElementById('dt-body').textContent =
+      `This tray contains ${tray.instruments.length} instrument${tray.instruments.length !== 1 ? 's' : ''}. All will be permanently removed.`;
+    document.getElementById('dt-confirm').onclick = () => deleteTray(trayId);
+    openModal('modal-del-tray');
+  }
+
+  async function deleteTray(trayId) {
+    closeModal('modal-del-tray');
+    setLoading(true);
+    try {
+      const { error } = await sb.from('trays').delete().eq('id', trayId);
+      if (error) throw error;
+      openTrays.delete(trayId);
+      saveOpenState();
+      trays = trays.filter(t => t.id !== trayId);
+      render();
+      toast('Tray removed.');
+    } catch (err) {
+      toast('Failed to remove tray.', 'warn');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ── Toggle tray ──────────────────────────────────────────────────────
+  function toggleTray(trayId) {
+    const tray = trays.find(t => t.id === trayId);
+    tray.open = !tray.open;
+    if (tray.open) openTrays.add(trayId); else openTrays.delete(trayId);
+    saveOpenState();
+    document.getElementById('tray-' + trayId).classList.toggle('open', tray.open);
+  }
+
+  // ── Add instrument ───────────────────────────────────────────────────
+  async function addInstrument(trayId) {
+    const tray   = trays.find(t => t.id === trayId);
+    const name   = document.getElementById(`in-name-${trayId}`).value.trim();
+    const serial = document.getElementById(`in-serial-${trayId}`).value.trim();
+    const uses   = parseInt(document.getElementById(`in-uses-${trayId}`).value);
+
+    if (!name || !serial || !uses || uses < 1) { toast('Fill in name, serial and uses.', 'warn'); return; }
+
+    const allInsts = trays.flatMap(t => t.instruments);
+    if (allInsts.find(i => i.serial.toLowerCase() === serial.toLowerCase())) {
+      toast('Serial number already in use.', 'warn'); return;
+    }
+
+    const btn = document.querySelector(`#tray-${trayId} .btn-inst-add`);
+    if (btn) btn.disabled = true;
+    setLoading(true);
+
+    try {
+      const { data, error } = await sb.from('instruments')
+        .insert({ tray_id: trayId, name, serial, max_uses: uses, uses })
+        .select().single();
+      if (error) throw error;
+      tray.instruments.push(data);
+      render();
+      toast(`${name} added to ${tray.name}`);
+    } catch (err) {
+      toast('Failed to add instrument.', 'warn');
+      console.error(err);
+    } finally {
+      if (btn) btn.disabled = false;
+      setLoading(false);
+    }
+  }
+
+  // ── Deduct ───────────────────────────────────────────────────────────
+  function promptDeduct(trayId, instId) {
+    const inst = trays.find(t => t.id === trayId).instruments.find(i => i.id === instId);
+    if (!inst || inst.uses <= 0) return;
+
+    document.getElementById('md-name').textContent   = inst.name;
+    document.getElementById('md-serial').textContent = inst.serial;
+
+    const cur = document.getElementById('md-current');
+    cur.textContent = inst.uses;
+    cur.className = 'modal-uses-val ' + (inst.uses <= 2 ? 'low' : 'ok');
+    document.getElementById('md-after').textContent = inst.uses - 1;
+
+    const confirmBtn = document.getElementById('md-confirm');
+    confirmBtn.disabled = false;
+    confirmBtn.onclick = () => doDeduct(trayId, instId);
+    openModal('modal-deduct');
+  }
+
+  async function doDeduct(trayId, instId) {
+    const inst = trays.find(t => t.id === trayId).instruments.find(i => i.id === instId);
+    if (!inst || inst.uses <= 0) return;
+
+    document.getElementById('md-confirm').disabled = true;
+    setLoading(true);
+
+    try {
+      const newUses = inst.uses - 1;
+      const { error } = await sb.from('instruments').update({ uses: newUses }).eq('id', instId);
+      if (error) throw error;
+      inst.uses = newUses;
+      closeModal('modal-deduct');
+      render();
+      if (inst.uses === 0)     toast(`⚠ ${inst.name} now depleted`, 'warn');
+      else if (inst.uses <= 2) toast(`${inst.serial} — ${inst.uses} use${inst.uses === 1 ? '' : 's'} left`, 'warn');
+      else                     toast(`${inst.serial} — ${inst.uses} uses remaining`);
+    } catch (err) {
+      toast('Failed to update. Try again.', 'warn');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ── Delete instrument ────────────────────────────────────────────────
+  function promptDeleteInst(trayId, instId) {
+    const inst = trays.find(t => t.id === trayId).instruments.find(i => i.id === instId);
+    document.getElementById('di-name').textContent = inst.name;
+    document.getElementById('di-body').textContent =
+      `Serial: ${inst.serial} · ${inst.uses} use${inst.uses !== 1 ? 's' : ''} remaining. This will be permanently removed.`;
+    document.getElementById('di-confirm').onclick = () => deleteInstrument(trayId, instId);
+    openModal('modal-del-inst');
+  }
+
+  async function deleteInstrument(trayId, instId) {
+    closeModal('modal-del-inst');
+    setLoading(true);
+    try {
+      const { error } = await sb.from('instruments').delete().eq('id', instId);
+      if (error) throw error;
+      const tray = trays.find(t => t.id === trayId);
+      tray.instruments = tray.instruments.filter(i => i.id !== instId);
+      render();
+      toast('Instrument removed.');
+    } catch (err) {
+      toast('Failed to remove instrument.', 'warn');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ── Stats ────────────────────────────────────────────────────────────
+  function updateStats() {
+    const all = trays.flatMap(t => t.instruments);
+    document.getElementById('stat-trays').textContent    = trays.length;
+    document.getElementById('stat-uses').textContent     = all.reduce((s, i) => s + i.uses, 0);
+    document.getElementById('stat-depleted').textContent = all.filter(i => i.uses === 0).length;
+  }
+
+  // ── Render ───────────────────────────────────────────────────────────
+  function render() {
+    updateStats();
+    const container = document.getElementById('trays-container');
+
+    if (trays.length === 0) {
+      container.innerHTML = `
+        <div class="empty-trays">
+          <div class="icon">🗂️</div>
+          <p>No trays yet.<br>Add one above to get started.</p>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = trays.map(tray => {
+      const allUses  = tray.instruments.reduce((s, i) => s + i.uses, 0);
+      const depleted = tray.instruments.filter(i => i.uses === 0).length;
+      const pillClass = depleted > 0 ? 'warn' : allUses === 0 && tray.instruments.length > 0 ? 'grey' : 'ok';
+      const pillText  = tray.instruments.length === 0
+        ? '0 instruments'
+        : `${allUses} uses · ${depleted} depleted`;
+
+      const instrHtml = tray.instruments.length === 0
+        ? `<div class="inst-empty">No instruments yet — add one below.</div>`
+        : tray.instruments.map(inst => `
+            <div class="inst-row ${cls(inst)}">
+              <div class="inst-top">
+                <div class="inst-info">
+                  <div class="inst-name">${inst.name}</div>
+                  <div class="inst-serial">${inst.serial}</div>
+                  ${inst.uses === 0 ? '<span class="tag-depleted">depleted</span>' : ''}
+                </div>
+                <div class="inst-uses">
+                  <div class="inst-uses-num ${cls(inst)}">${inst.uses}</div>
+                  <div class="inst-uses-label">uses left</div>
+                </div>
+              </div>
+              <div class="inst-bar-wrap">
+                <div class="inst-bar ${cls(inst)}" style="width:${pct(inst)}%"></div>
+              </div>
+              <div class="inst-actions">
+                <button class="btn-end-case" onclick="promptDeduct(${tray.id},${inst.id})" ${inst.uses === 0 ? 'disabled' : ''}>− End Case</button>
+                <button class="btn-inst-del" onclick="promptDeleteInst(${tray.id},${inst.id})">✕</button>
+              </div>
+            </div>`).join('');
+
+      return `
+        <div class="tray-card ${tray.open ? 'open' : ''}" id="tray-${tray.id}">
+          <div class="tray-header" onclick="toggleTray(${tray.id})">
+            <div class="tray-header-left">
+              <span class="tray-chevron">▶</span>
+              <div class="tray-name-wrap">
+                <div class="tray-name">${tray.name}</div>
+                <div class="tray-meta">${tray.instruments.length} instrument${tray.instruments.length !== 1 ? 's' : ''}</div>
+              </div>
+            </div>
+            <div class="tray-pills">
+              <span class="pill ${pillClass}">${pillText}</span>
+            </div>
+            <button class="btn-tray-delete" onclick="event.stopPropagation(); promptDeleteTray(${tray.id})">✕</button>
+          </div>
+          <div class="tray-body">
+            <div class="instrument-list">${instrHtml}</div>
+            <div class="add-instrument-form">
+              <div class="panel-label" style="margin-bottom:0">Add Instrument to ${tray.name}</div>
+              <input class="input-name" type="text" id="in-name-${tray.id}" placeholder="Instrument name" autocomplete="off" />
+              <div class="form-row-inner">
+                <input class="input-serial" type="text" id="in-serial-${tray.id}" placeholder="Serial no." autocomplete="off" autocapitalize="characters" />
+                <input class="input-uses" type="number" id="in-uses-${tray.id}" placeholder="Uses" min="1" inputmode="numeric" />
+              </div>
+              <button class="btn-inst-add" onclick="addInstrument(${tray.id})">+ Add Instrument</button>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  document.getElementById('input-tray-name').addEventListener('keydown', e => {
+    if (e.key === 'Enter') addTray();
+  });
+
+  // Load on start if already unlocked
+  if (sessionStorage.getItem(SESSION_KEY) === '1') loadData();
+</script>
+</body>
+</html>
