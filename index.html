@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>OR Equipment Tracker</title>
+<title>Cardiac Robotic Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -59,14 +59,7 @@
   }
   #lock-screen.hidden { display: none; }
 
-  .lock-box {
-    width: 100%;
-    max-width: 340px;
-    position: relative;
-    z-index: 1;
-    text-align: center;
-  }
-
+  .lock-box { width: 100%; max-width: 340px; position: relative; z-index: 1; text-align: center; }
   .lock-icon { font-size: 40px; margin-bottom: 18px; }
   .lock-title { font-family: var(--mono); font-size: 19px; font-weight: 500; margin-bottom: 6px; }
   .lock-subtitle { font-size: 13px; color: var(--muted); margin-bottom: 32px; line-height: 1.5; }
@@ -132,7 +125,6 @@
 
   .header-left h1 { font-family: var(--mono); font-size: 18px; font-weight: 500; }
   .header-left .subtitle { font-size: 11px; color: var(--muted); margin-top: 3px; letter-spacing: 0.6px; text-transform: uppercase; }
-  .header-right { display: flex; align-items: center; gap: 10px; }
 
   .badge {
     background: var(--accent-dim);
@@ -145,49 +137,18 @@
     letter-spacing: 0.5px;
   }
 
-  .btn-lock {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    padding: 5px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    touch-action: manipulation;
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.5px;
-    transition: all 0.15s;
-  }
-  .btn-lock:active { border-color: var(--accent); color: var(--accent); }
-
   /* ── Stats ── */
   .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-
   .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 10px; text-align: center; }
   .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); margin-bottom: 5px; }
   .stat-value { font-family: var(--mono); font-size: 26px; font-weight: 500; line-height: 1; }
   .stat-value.accent { color: var(--accent); }
   .stat-value.warn { color: var(--warn); }
 
-  /* ── Loading ── */
-  .loading-bar {
-    height: 2px;
-    background: var(--border);
-    border-radius: 1px;
-    overflow: hidden;
-    margin-bottom: 20px;
-  }
-  .loading-bar-inner {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 1px;
-    animation: loading 1.2s ease-in-out infinite;
-  }
-  @keyframes loading {
-    0% { width: 0%; margin-left: 0; }
-    50% { width: 60%; margin-left: 20%; }
-    100% { width: 0%; margin-left: 100%; }
-  }
+  /* ── Loading bar ── */
+  .loading-bar { height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; margin-bottom: 20px; }
+  .loading-bar-inner { height: 100%; background: var(--accent); border-radius: 1px; animation: loadanim 1.2s ease-in-out infinite; }
+  @keyframes loadanim { 0% { width:0%;margin-left:0 } 50% { width:60%;margin-left:20% } 100% { width:0%;margin-left:100% } }
   .loading-bar.hidden { display: none; }
 
   /* ── Add Tray ── */
@@ -226,7 +187,7 @@
     transition: background 0.15s, transform 0.1s;
     flex-shrink: 0;
   }
-  .btn-tray-add:active { transform: scale(0.97); background: #00c49d; }
+  .btn-tray-add:active { transform: scale(0.97); }
   .btn-tray-add:disabled { opacity: 0.5; cursor: not-allowed; }
 
   /* ── Tray cards ── */
@@ -247,35 +208,54 @@
   }
   .tray-card.open .tray-header { border-bottom-color: var(--border); }
 
-  .tray-header-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
-
+  .tray-header-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
   .tray-chevron { color: var(--muted); font-size: 12px; transition: transform 0.25s; flex-shrink: 0; }
   .tray-card.open .tray-chevron { transform: rotate(90deg); }
 
-  .tray-name-wrap { min-width: 0; }
-  .tray-name { font-size: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tray-name-wrap { min-width: 0; flex: 1; }
+
+  /* Inline edit for tray name */
+  .tray-name-display { font-size: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tray-name-input {
+    font-size: 15px;
+    font-weight: 600;
+    font-family: var(--sans);
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    color: var(--text);
+    padding: 4px 8px;
+    outline: none;
+    width: 100%;
+    display: none;
+  }
+  .tray-name-wrap.editing .tray-name-display { display: none; }
+  .tray-name-wrap.editing .tray-name-input { display: block; }
+
   .tray-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
-  .tray-pills { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .tray-header-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 
   .pill { font-family: var(--mono); font-size: 12px; padding: 3px 10px; border-radius: 20px; border: 1px solid; }
   .pill.ok { background: var(--accent-dim); border-color: rgba(0,212,170,0.3); color: var(--accent); }
   .pill.warn { background: var(--warn-dim); border-color: rgba(255,107,74,0.35); color: var(--warn); }
   .pill.grey { background: rgba(90,104,128,0.12); border-color: var(--border); color: var(--muted); }
 
-  .btn-tray-delete {
+  .btn-icon {
     background: transparent;
     border: 1px solid var(--border);
     color: var(--muted);
-    font-size: 14px;
+    font-size: 13px;
     padding: 6px 9px;
     border-radius: 7px;
     cursor: pointer;
     touch-action: manipulation;
     flex-shrink: 0;
     line-height: 1;
+    transition: all 0.15s;
   }
-  .btn-tray-delete:active { border-color: var(--warn); color: var(--warn); }
+  .btn-icon:active { border-color: var(--accent); color: var(--accent); }
+  .btn-icon.del:active { border-color: var(--warn); color: var(--warn); }
 
   .tray-body { display: none; padding: 14px 16px 16px; flex-direction: column; gap: 10px; }
   .tray-card.open .tray-body { display: flex; }
@@ -329,8 +309,55 @@
 
   .inst-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 10px; }
   .inst-info { flex: 1; min-width: 0; }
-  .inst-name { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+
+  /* Inline edit for instrument name */
+  .inst-name-display { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+  .inst-name-input {
+    font-size: 14px;
+    font-weight: 500;
+    font-family: var(--sans);
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    border-radius: 5px;
+    color: var(--text);
+    padding: 3px 7px;
+    outline: none;
+    width: 100%;
+    margin-bottom: 2px;
+    display: none;
+  }
+  .inst-info.editing .inst-name-display { display: none; }
+  .inst-info.editing .inst-name-input { display: block; }
+
   .inst-serial { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.4px; }
+
+  /* Use log under instrument */
+  .inst-log { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+  .log-entry {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--bg);
+    border-radius: 5px;
+    padding: 5px 8px;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .log-entry .log-user { color: var(--mid); font-weight: 500; }
+  .log-entry .log-time { color: var(--muted); font-size: 10px; }
+  .log-toggle {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 0;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    margin-top: 2px;
+  }
 
   .inst-uses { display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0; }
   .inst-uses-num { font-family: var(--mono); font-size: 24px; font-weight: 500; line-height: 1; }
@@ -359,23 +386,9 @@
     border-radius: 7px;
     cursor: pointer;
     touch-action: manipulation;
-    transition: background 0.15s;
   }
   .btn-end-case:active:not(:disabled) { background: rgba(255,107,74,0.22); }
   .btn-end-case:disabled { opacity: 0.28; cursor: not-allowed; }
-
-  .btn-inst-del {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 14px;
-    padding: 11px 13px;
-    border-radius: 7px;
-    cursor: pointer;
-    touch-action: manipulation;
-    line-height: 1;
-  }
-  .btn-inst-del:active { border-color: var(--warn); color: var(--warn); }
 
   .tag-depleted {
     display: inline-block;
@@ -463,7 +476,7 @@
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 14px 16px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -475,6 +488,36 @@
   .modal-uses-val.low { color: var(--warn); }
   .modal-uses-val.after { color: var(--warn); }
   .modal-arrow { font-size: 20px; color: var(--muted); flex-shrink: 0; }
+
+  /* Name field inside deduct modal */
+  .modal-name-field {
+    margin-bottom: 16px;
+  }
+  .modal-name-field label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--muted);
+    margin-bottom: 7px;
+  }
+  .modal-name-field input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    padding: 13px 14px;
+    outline: none;
+    appearance: none;
+    transition: border-color 0.2s;
+  }
+  .modal-name-field input:focus { border-color: var(--accent); }
+  .modal-name-field input::placeholder { color: var(--muted); }
+  .modal-name-field input.error { border-color: var(--warn); }
 
   .modal-btns { display: flex; flex-direction: column; gap: 10px; }
 
@@ -511,11 +554,11 @@
 </head>
 <body>
 
-<!-- Lock screen -->
+<!-- Lock screen — always shown on load -->
 <div id="lock-screen">
   <div class="lock-box">
     <div class="lock-icon">🔒</div>
-    <div class="lock-title">OR Equipment Tracker</div>
+    <div class="lock-title">Cardiac Robotic Tracker</div>
     <div class="lock-subtitle">Enter the access password to continue.</div>
     <input class="lock-input" type="password" id="lock-input" placeholder="Password" autocomplete="off" />
     <div class="lock-error" id="lock-error"></div>
@@ -529,13 +572,10 @@
 
   <header>
     <div class="header-left">
-      <h1>OR Tracker</h1>
+      <h1>Cardiac Robotic Tracker</h1>
       <div class="subtitle">Tray & Instrument Log</div>
     </div>
-    <div class="header-right">
-      <div class="badge">LIVE</div>
-      <button class="btn-lock" onclick="lockApp()">🔒 Lock</button>
-    </div>
+    <div class="badge">LIVE</div>
   </header>
 
   <div class="stats">
@@ -553,12 +593,12 @@
     </div>
   </div>
 
-  <div class="loading-bar" id="loading-bar"><div class="loading-bar-inner"></div></div>
+  <div class="loading-bar hidden" id="loading-bar"><div class="loading-bar-inner"></div></div>
 
   <div class="add-tray-panel">
     <div class="panel-label">Add Tray</div>
     <div class="add-tray-row">
-      <input type="text" id="input-tray-name" placeholder="e.g. Tray 1, Laparoscopy Set…" autocomplete="off" />
+      <input type="text" id="input-tray-name" placeholder="e.g. Tray 1, Robotic Arm Set…" autocomplete="off" />
       <button class="btn-tray-add" id="btn-add-tray" onclick="addTray()">+ Add</button>
     </div>
   </div>
@@ -568,7 +608,7 @@
 </div>
 </div>
 
-<!-- End Case modal -->
+<!-- End Case modal (with name field) -->
 <div class="modal-overlay" id="modal-deduct" onclick="closeModal('modal-deduct')">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
@@ -585,6 +625,10 @@
         <div class="modal-uses-sub">After</div>
         <div class="modal-uses-val after" id="md-after"></div>
       </div>
+    </div>
+    <div class="modal-name-field">
+      <label>Your name</label>
+      <input type="text" id="md-user-name" placeholder="e.g. Dr. Smith" autocomplete="off" autocapitalize="words" />
     </div>
     <div class="modal-btns">
       <button class="btn-modal-confirm" id="md-confirm">Confirm — Use 1 Life</button>
@@ -624,23 +668,21 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  // ── Supabase ────────────────────────────────────────────────────────
+  // ── Supabase ──────────────────────────────────────────────────────────
   const { createClient } = supabase;
   const sb = createClient(
     'https://zmyxcrdygechxnjxxzqr.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpteXhjcmR5Z2VjaHhuanh4enFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NzA5NzAsImV4cCI6MjA5NDQ0Njk3MH0.fcR8G4aeQtMtcqhFnVuNIWS1neF7KucH0_gdcHpjYHQ'
   );
 
-  // ── Auth ────────────────────────────────────────────────────────────
-  const PASSWORD = 'Barts2026';
-  const SESSION_KEY = 'or_unlocked';
+  // ── Auth — always lock on page load ───────────────────────────────────
+  const PASSWORD = 'bartsmitral';
 
   function checkPassword() {
     const val = document.getElementById('lock-input').value;
     const inp = document.getElementById('lock-input');
     const err = document.getElementById('lock-error');
     if (val === PASSWORD) {
-      sessionStorage.setItem(SESSION_KEY, '1');
       document.getElementById('lock-screen').classList.add('hidden');
       document.getElementById('app').style.display = 'block';
       loadData();
@@ -652,38 +694,24 @@
     }
   }
 
-  function lockApp() {
-    sessionStorage.removeItem(SESSION_KEY);
-    document.getElementById('lock-screen').classList.remove('hidden');
-    document.getElementById('app').style.display = 'none';
-    document.getElementById('lock-input').value = '';
-    document.getElementById('lock-error').textContent = '';
-  }
-
   document.getElementById('lock-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') checkPassword();
   });
 
-  if (sessionStorage.getItem(SESSION_KEY) === '1') {
-    document.getElementById('lock-screen').classList.add('hidden');
-    document.getElementById('app').style.display = 'block';
-  }
-
-  // ── State ───────────────────────────────────────────────────────────
-  // trays = [ { id, name, open, instruments: [...] } ]
+  // ── State ─────────────────────────────────────────────────────────────
   let trays = [];
-  let openTrays = new Set(JSON.parse(sessionStorage.getItem('open_trays') || '[]'));
+  // Track which trays are open in memory only (resets on page load — fine)
+  const openTrays = new Set();
 
-  function saveOpenState() {
-    sessionStorage.setItem('open_trays', JSON.stringify([...openTrays]));
-  }
+  // Per-instrument log visibility
+  const showLog = new Set();
 
-  // ── Loading ─────────────────────────────────────────────────────────
+  // ── Loading ───────────────────────────────────────────────────────────
   function setLoading(on) {
     document.getElementById('loading-bar').classList.toggle('hidden', !on);
   }
 
-  // ── Toast ───────────────────────────────────────────────────────────
+  // ── Toast ─────────────────────────────────────────────────────────────
   function toast(msg, type = '') {
     const t = document.getElementById('toast');
     t.textContent = msg; t.className = 'toast ' + type;
@@ -691,15 +719,21 @@
     setTimeout(() => t.classList.remove('show'), 2800);
   }
 
-  // ── Modals ──────────────────────────────────────────────────────────
+  // ── Modals ────────────────────────────────────────────────────────────
   function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
   function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow = ''; }
 
-  // ── Helpers ─────────────────────────────────────────────────────────
+  // ── Helpers ───────────────────────────────────────────────────────────
   const cls = i => i.uses === 0 ? 'depleted' : i.uses <= 2 ? 'low' : 'ok';
   const pct = i => i.max_uses > 0 ? (i.uses / i.max_uses) * 100 : 0;
 
-  // ── Load data ────────────────────────────────────────────────────────
+  function formatDate(iso) {
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
+      + ' ' + d.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+  }
+
+  // ── Load data ─────────────────────────────────────────────────────────
   async function loadData() {
     setLoading(true);
     try {
@@ -709,10 +743,17 @@
       const { data: instRows, error: e2 } = await sb.from('instruments').select('*').order('created_at');
       if (e2) throw e2;
 
+      const { data: logRows, error: e3 } = await sb.from('use_log').select('*').order('used_at', { ascending: false });
+      if (e3) throw e3;
+
       trays = trayRows.map(t => ({
         ...t,
-        open: openTrays.has(t.id),
-        instruments: instRows.filter(i => i.tray_id === t.id)
+        instruments: instRows
+          .filter(i => i.tray_id === t.id)
+          .map(i => ({
+            ...i,
+            log: logRows.filter(l => l.instrument_id === i.id)
+          }))
       }));
 
       render();
@@ -724,38 +765,72 @@
     }
   }
 
-  // ── Add tray ─────────────────────────────────────────────────────────
+  // ── Add tray ──────────────────────────────────────────────────────────
   async function addTray() {
     const name = document.getElementById('input-tray-name').value.trim();
     if (!name) { toast('Enter a tray name.', 'warn'); return; }
     if (trays.find(t => t.name.toLowerCase() === name.toLowerCase())) {
       toast('A tray with that name already exists.', 'warn'); return;
     }
-
     const btn = document.getElementById('btn-add-tray');
-    btn.disabled = true;
-    setLoading(true);
-
+    btn.disabled = true; setLoading(true);
     try {
       const { data, error } = await sb.from('trays').insert({ name }).select().single();
       if (error) throw error;
       openTrays.add(data.id);
-      saveOpenState();
-      trays.push({ ...data, open: true, instruments: [] });
+      trays.push({ ...data, instruments: [] });
       render();
       toast(`${name} added`);
       document.getElementById('input-tray-name').value = '';
     } catch (err) {
-      toast('Failed to add tray.', 'warn');
-      console.error(err);
+      toast('Failed to add tray.', 'warn'); console.error(err);
     } finally {
-      btn.disabled = false;
-      setLoading(false);
+      btn.disabled = false; setLoading(false);
     }
   }
 
-  // ── Delete tray ──────────────────────────────────────────────────────
-  function promptDeleteTray(trayId) {
+  // ── Rename tray (inline) ──────────────────────────────────────────────
+  function startRenameTray(trayId, e) {
+    e.stopPropagation();
+    const wrap = document.querySelector(`#tray-${trayId} .tray-name-wrap`);
+    const inp  = wrap.querySelector('.tray-name-input');
+    const tray = trays.find(t => t.id === trayId);
+    inp.value = tray.name;
+    wrap.classList.add('editing');
+    inp.focus(); inp.select();
+
+    function finish() {
+      inp.removeEventListener('blur', finish);
+      inp.removeEventListener('keydown', onKey);
+      const newName = inp.value.trim();
+      wrap.classList.remove('editing');
+      if (!newName || newName === tray.name) { render(); return; }
+      renameTray(trayId, newName);
+    }
+    function onKey(e) {
+      if (e.key === 'Enter') { inp.blur(); }
+      if (e.key === 'Escape') { inp.value = tray.name; inp.blur(); }
+    }
+    inp.addEventListener('blur', finish);
+    inp.addEventListener('keydown', onKey);
+  }
+
+  async function renameTray(trayId, newName) {
+    setLoading(true);
+    try {
+      const { error } = await sb.from('trays').update({ name: newName }).eq('id', trayId);
+      if (error) throw error;
+      trays.find(t => t.id === trayId).name = newName;
+      render();
+      toast('Tray renamed.');
+    } catch (err) {
+      toast('Failed to rename tray.', 'warn'); console.error(err);
+    } finally { setLoading(false); }
+  }
+
+  // ── Delete tray ───────────────────────────────────────────────────────
+  function promptDeleteTray(trayId, e) {
+    e.stopPropagation();
     const tray = trays.find(t => t.id === trayId);
     document.getElementById('dt-name').textContent = tray.name;
     document.getElementById('dt-body').textContent =
@@ -765,34 +840,26 @@
   }
 
   async function deleteTray(trayId) {
-    closeModal('modal-del-tray');
-    setLoading(true);
+    closeModal('modal-del-tray'); setLoading(true);
     try {
       const { error } = await sb.from('trays').delete().eq('id', trayId);
       if (error) throw error;
       openTrays.delete(trayId);
-      saveOpenState();
       trays = trays.filter(t => t.id !== trayId);
-      render();
-      toast('Tray removed.');
+      render(); toast('Tray removed.');
     } catch (err) {
-      toast('Failed to remove tray.', 'warn');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+      toast('Failed to remove tray.', 'warn'); console.error(err);
+    } finally { setLoading(false); }
   }
 
-  // ── Toggle tray ──────────────────────────────────────────────────────
+  // ── Toggle tray ───────────────────────────────────────────────────────
   function toggleTray(trayId) {
-    const tray = trays.find(t => t.id === trayId);
-    tray.open = !tray.open;
-    if (tray.open) openTrays.add(trayId); else openTrays.delete(trayId);
-    saveOpenState();
-    document.getElementById('tray-' + trayId).classList.toggle('open', tray.open);
+    const isOpen = openTrays.has(trayId);
+    if (isOpen) openTrays.delete(trayId); else openTrays.add(trayId);
+    document.getElementById('tray-' + trayId).classList.toggle('open', !isOpen);
   }
 
-  // ── Add instrument ───────────────────────────────────────────────────
+  // ── Add instrument ────────────────────────────────────────────────────
   async function addInstrument(trayId) {
     const tray   = trays.find(t => t.id === trayId);
     const name   = document.getElementById(`in-name-${trayId}`).value.trim();
@@ -807,27 +874,61 @@
     }
 
     const btn = document.querySelector(`#tray-${trayId} .btn-inst-add`);
-    if (btn) btn.disabled = true;
-    setLoading(true);
+    if (btn) btn.disabled = true; setLoading(true);
 
     try {
       const { data, error } = await sb.from('instruments')
         .insert({ tray_id: trayId, name, serial, max_uses: uses, uses })
         .select().single();
       if (error) throw error;
-      tray.instruments.push(data);
-      render();
-      toast(`${name} added to ${tray.name}`);
+      tray.instruments.push({ ...data, log: [] });
+      render(); toast(`${name} added to ${tray.name}`);
     } catch (err) {
-      toast('Failed to add instrument.', 'warn');
-      console.error(err);
+      toast('Failed to add instrument.', 'warn'); console.error(err);
     } finally {
-      if (btn) btn.disabled = false;
-      setLoading(false);
+      if (btn) btn.disabled = false; setLoading(false);
     }
   }
 
-  // ── Deduct ───────────────────────────────────────────────────────────
+  // ── Rename instrument (inline) ────────────────────────────────────────
+  function startRenameInst(trayId, instId, e) {
+    e.stopPropagation();
+    const infoEl = document.querySelector(`[data-inst-id="${instId}"] .inst-info`);
+    const inp    = infoEl.querySelector('.inst-name-input');
+    const inst   = trays.find(t => t.id === trayId).instruments.find(i => i.id === instId);
+    inp.value = inst.name;
+    infoEl.classList.add('editing');
+    inp.focus(); inp.select();
+
+    function finish() {
+      inp.removeEventListener('blur', finish);
+      inp.removeEventListener('keydown', onKey);
+      const newName = inp.value.trim();
+      infoEl.classList.remove('editing');
+      if (!newName || newName === inst.name) { render(); return; }
+      renameInstrument(instId, newName);
+    }
+    function onKey(e) {
+      if (e.key === 'Enter') inp.blur();
+      if (e.key === 'Escape') { inp.value = inst.name; inp.blur(); }
+    }
+    inp.addEventListener('blur', finish);
+    inp.addEventListener('keydown', onKey);
+  }
+
+  async function renameInstrument(instId, newName) {
+    setLoading(true);
+    try {
+      const { error } = await sb.from('instruments').update({ name: newName }).eq('id', instId);
+      if (error) throw error;
+      trays.forEach(t => { const i = t.instruments.find(i => i.id === instId); if (i) i.name = newName; });
+      render(); toast('Instrument renamed.');
+    } catch (err) {
+      toast('Failed to rename instrument.', 'warn'); console.error(err);
+    } finally { setLoading(false); }
+  }
+
+  // ── Deduct ────────────────────────────────────────────────────────────
   function promptDeduct(trayId, instId) {
     const inst = trays.find(t => t.id === trayId).instruments.find(i => i.id === instId);
     if (!inst || inst.uses <= 0) return;
@@ -840,13 +941,28 @@
     cur.className = 'modal-uses-val ' + (inst.uses <= 2 ? 'low' : 'ok');
     document.getElementById('md-after').textContent = inst.uses - 1;
 
+    const nameInput = document.getElementById('md-user-name');
+    nameInput.value = '';
+    nameInput.classList.remove('error');
+
     const confirmBtn = document.getElementById('md-confirm');
     confirmBtn.disabled = false;
     confirmBtn.onclick = () => doDeduct(trayId, instId);
     openModal('modal-deduct');
+    setTimeout(() => nameInput.focus(), 350);
   }
 
   async function doDeduct(trayId, instId) {
+    const nameInput = document.getElementById('md-user-name');
+    const userName  = nameInput.value.trim();
+    if (!userName) {
+      nameInput.classList.add('error');
+      nameInput.placeholder = 'Please enter your name';
+      nameInput.focus();
+      return;
+    }
+    nameInput.classList.remove('error');
+
     const inst = trays.find(t => t.id === trayId).instruments.find(i => i.id === instId);
     if (!inst || inst.uses <= 0) return;
 
@@ -855,23 +971,29 @@
 
     try {
       const newUses = inst.uses - 1;
-      const { error } = await sb.from('instruments').update({ uses: newUses }).eq('id', instId);
-      if (error) throw error;
+      const { error: e1 } = await sb.from('instruments').update({ uses: newUses }).eq('id', instId);
+      if (e1) throw e1;
+
+      const { data: logEntry, error: e2 } = await sb.from('use_log')
+        .insert({ instrument_id: instId, used_by: userName })
+        .select().single();
+      if (e2) throw e2;
+
       inst.uses = newUses;
+      inst.log.unshift(logEntry);
+
       closeModal('modal-deduct');
       render();
+
       if (inst.uses === 0)     toast(`⚠ ${inst.name} now depleted`, 'warn');
       else if (inst.uses <= 2) toast(`${inst.serial} — ${inst.uses} use${inst.uses === 1 ? '' : 's'} left`, 'warn');
       else                     toast(`${inst.serial} — ${inst.uses} uses remaining`);
     } catch (err) {
-      toast('Failed to update. Try again.', 'warn');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+      toast('Failed to update. Try again.', 'warn'); console.error(err);
+    } finally { setLoading(false); }
   }
 
-  // ── Delete instrument ────────────────────────────────────────────────
+  // ── Delete instrument ─────────────────────────────────────────────────
   function promptDeleteInst(trayId, instId) {
     const inst = trays.find(t => t.id === trayId).instruments.find(i => i.id === instId);
     document.getElementById('di-name').textContent = inst.name;
@@ -882,24 +1004,25 @@
   }
 
   async function deleteInstrument(trayId, instId) {
-    closeModal('modal-del-inst');
-    setLoading(true);
+    closeModal('modal-del-inst'); setLoading(true);
     try {
       const { error } = await sb.from('instruments').delete().eq('id', instId);
       if (error) throw error;
       const tray = trays.find(t => t.id === trayId);
       tray.instruments = tray.instruments.filter(i => i.id !== instId);
-      render();
-      toast('Instrument removed.');
+      render(); toast('Instrument removed.');
     } catch (err) {
-      toast('Failed to remove instrument.', 'warn');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+      toast('Failed to remove instrument.', 'warn'); console.error(err);
+    } finally { setLoading(false); }
   }
 
-  // ── Stats ────────────────────────────────────────────────────────────
+  // ── Toggle log visibility ─────────────────────────────────────────────
+  function toggleLog(instId) {
+    if (showLog.has(instId)) showLog.delete(instId); else showLog.add(instId);
+    render();
+  }
+
+  // ── Stats ─────────────────────────────────────────────────────────────
   function updateStats() {
     const all = trays.flatMap(t => t.instruments);
     document.getElementById('stat-trays').textContent    = trays.length;
@@ -907,7 +1030,7 @@
     document.getElementById('stat-depleted').textContent = all.filter(i => i.uses === 0).length;
   }
 
-  // ── Render ───────────────────────────────────────────────────────────
+  // ── Render ────────────────────────────────────────────────────────────
   function render() {
     updateStats();
     const container = document.getElementById('trays-container');
@@ -931,42 +1054,65 @@
 
       const instrHtml = tray.instruments.length === 0
         ? `<div class="inst-empty">No instruments yet — add one below.</div>`
-        : tray.instruments.map(inst => `
-            <div class="inst-row ${cls(inst)}">
-              <div class="inst-top">
-                <div class="inst-info">
-                  <div class="inst-name">${inst.name}</div>
-                  <div class="inst-serial">${inst.serial}</div>
-                  ${inst.uses === 0 ? '<span class="tag-depleted">depleted</span>' : ''}
-                </div>
-                <div class="inst-uses">
-                  <div class="inst-uses-num ${cls(inst)}">${inst.uses}</div>
-                  <div class="inst-uses-label">uses left</div>
-                </div>
-              </div>
-              <div class="inst-bar-wrap">
-                <div class="inst-bar ${cls(inst)}" style="width:${pct(inst)}%"></div>
-              </div>
-              <div class="inst-actions">
-                <button class="btn-end-case" onclick="promptDeduct(${tray.id},${inst.id})" ${inst.uses === 0 ? 'disabled' : ''}>− End Case</button>
-                <button class="btn-inst-del" onclick="promptDeleteInst(${tray.id},${inst.id})">✕</button>
-              </div>
-            </div>`).join('');
+        : tray.instruments.map(inst => {
+            const logVisible = showLog.has(inst.id);
+            const logHtml = inst.log.length === 0 ? '' : `
+              <div class="inst-log" ${logVisible ? '' : 'style="display:none"'}>
+                ${inst.log.map(l => `
+                  <div class="log-entry">
+                    <span class="log-user">${l.used_by}</span>
+                    <span class="log-time">${formatDate(l.used_at)}</span>
+                  </div>`).join('')}
+              </div>`;
+            const logToggle = inst.log.length === 0 ? '' : `
+              <button class="log-toggle" onclick="toggleLog(${inst.id})">
+                ${logVisible ? 'Hide log' : `Show log (${inst.log.length})`}
+              </button>`;
 
+            return `
+              <div class="inst-row ${cls(inst)}" data-inst-id="${inst.id}">
+                <div class="inst-top">
+                  <div class="inst-info">
+                    <div class="inst-name-display">${inst.name}</div>
+                    <input class="inst-name-input" type="text" value="${inst.name}" autocomplete="off" />
+                    <div class="inst-serial">${inst.serial}</div>
+                    ${inst.uses === 0 ? '<span class="tag-depleted">depleted</span>' : ''}
+                    ${logToggle}
+                  </div>
+                  <div class="inst-uses">
+                    <div class="inst-uses-num ${cls(inst)}">${inst.uses}</div>
+                    <div class="inst-uses-label">uses left</div>
+                  </div>
+                </div>
+                ${logHtml}
+                <div class="inst-bar-wrap">
+                  <div class="inst-bar ${cls(inst)}" style="width:${pct(inst)}%"></div>
+                </div>
+                <div class="inst-actions">
+                  <button class="btn-end-case" onclick="promptDeduct(${tray.id},${inst.id})" ${inst.uses === 0 ? 'disabled' : ''}> End procedure</button>
+                  <button class="btn-icon" onclick="startRenameInst(${tray.id},${inst.id},event)" title="Rename">✏️</button>
+                  <button class="btn-icon del" onclick="promptDeleteInst(${tray.id},${inst.id})">✕</button>
+                </div>
+              </div>`;
+          }).join('');
+
+      const isOpen = openTrays.has(tray.id);
       return `
-        <div class="tray-card ${tray.open ? 'open' : ''}" id="tray-${tray.id}">
+        <div class="tray-card ${isOpen ? 'open' : ''}" id="tray-${tray.id}">
           <div class="tray-header" onclick="toggleTray(${tray.id})">
             <div class="tray-header-left">
               <span class="tray-chevron">▶</span>
               <div class="tray-name-wrap">
-                <div class="tray-name">${tray.name}</div>
+                <div class="tray-name-display">${tray.name}</div>
+                <input class="tray-name-input" type="text" value="${tray.name}" autocomplete="off" />
                 <div class="tray-meta">${tray.instruments.length} instrument${tray.instruments.length !== 1 ? 's' : ''}</div>
               </div>
             </div>
-            <div class="tray-pills">
+            <div class="tray-header-actions">
               <span class="pill ${pillClass}">${pillText}</span>
+              <button class="btn-icon" onclick="startRenameTray(${tray.id},event)" title="Rename">✏️</button>
+              <button class="btn-icon del" onclick="promptDeleteTray(${tray.id},event)">✕</button>
             </div>
-            <button class="btn-tray-delete" onclick="event.stopPropagation(); promptDeleteTray(${tray.id})">✕</button>
           </div>
           <div class="tray-body">
             <div class="instrument-list">${instrHtml}</div>
@@ -987,9 +1133,6 @@
   document.getElementById('input-tray-name').addEventListener('keydown', e => {
     if (e.key === 'Enter') addTray();
   });
-
-  // Load on start if already unlocked
-  if (sessionStorage.getItem(SESSION_KEY) === '1') loadData();
 </script>
 </body>
 </html>
